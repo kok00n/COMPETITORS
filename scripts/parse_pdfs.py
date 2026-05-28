@@ -42,6 +42,8 @@ CONFIG_PATH = REPO_ROOT / "config" / "funds.yaml"
 # remove [\s_]) wszystkie nazwy sa concat-ami.
 NAME_PREFIXES_TO_STRIP = [
     # Generic
+    "parasolowy",       # Rockbridge: 'ROCKBRIDGE FIO Parasolowy Rockbridge Subfundusz X'
+    "parasol",
     "subfundusz",
     "fundusz",
     # TFI prefixy (dluzsze pierwsze)
