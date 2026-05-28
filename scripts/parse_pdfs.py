@@ -31,29 +31,78 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 CONFIG_PATH = REPO_ROOT / "config" / "funds.yaml"
 
-# Prefixy do strip z subfund_name przed fuzzy match (czesto wystepuja w PDFie ale
-# nie w discover output - albo odwrotnie).
+# Prefixy do strip z subfund_name przed fuzzy match. Pierwsze sa typu generycznego
+# (Subfundusz, Fundusz, FIO/SFIO) - sluza do nazwy bez TFI prefix. Reszta to
+# konkretne TFI prefixy (Allianz, Rockbridge, PKO, etc.) - usuwamy je zeby fuzzy
+# match dzialal po rebrandingu (np. Erste→Santander) i dla porownania nazw
+# w PDFie ('SubfunduszX') vs analizy.pl ('TFIName X').
+#
+# Kolejnosc ma znaczenie - dluzsze keyword'y najpierw zeby "credit agricole" nie
+# byl strippowany jako "credit" + "agricole" osobno. Po _normalize_name (lower +
+# remove [\s_]) wszystkie nazwy sa concat-ami.
 NAME_PREFIXES_TO_STRIP = [
+    # Generic
     "subfundusz",
     "fundusz",
+    # TFI prefixy (dluzsze pierwsze)
+    "creditagricole",
+    "goldmansachs",
+    "bnpparibas",
+    "rockbridge",
+    "investors",
+    "investor",
+    "skarbiec",
+    "generali",
+    "santander",
+    "allianz",
+    "quercus",
+    "esaliens",
+    "ipopema",
+    "pocztowy",
+    "velofund",
+    "velobank",
+    "caspar",
+    "alior",
+    "uniqa",
+    "noble",
+    "erste",
+    "prestiz",
+    "prestiż",
+    "pekao",
+    "bnpp",
+    "inpzu",
+    "pzu",
+    "pko",
+    "bnp",
+    "ing",
+    "axa",
+    "sgb",
+    # Common qualifiers po prefixie TFI
     "fio",
     "sfio",
 ]
 
 
 def _normalize_name(s: str) -> str:
-    """Lowercased, usuniete biale znaki + underscores + popularne prefiksy.
+    """Lowercased, usuniete biale znaki + underscores + iterative strip prefixow.
 
     Underscores wystepuja w BNP layout (fund_id = 'BNP_Paribas_Obligacji_Skarbowych').
     Whitespace usuwamy bo pdfplumber czasem rozdziela slowa spacjami losowo.
+
+    Iterative strip - usuwamy WIELE prefiksow z rzedu (np. 'AllianzSubfunduszAkcji'
+    → 'Akcji' po strip 'allianz' + 'subfundusz').
     """
     if not s:
         return ""
-    s = re.sub(r"[\s_]+", "", s).lower()
-    for prefix in NAME_PREFIXES_TO_STRIP:
-        if s.startswith(prefix):
-            s = s[len(prefix):]
-            break
+    s = re.sub(r"[\s_/.,&-]+", "", s).lower()
+    changed = True
+    while changed:
+        changed = False
+        for prefix in NAME_PREFIXES_TO_STRIP:
+            if s.startswith(prefix):
+                s = s[len(prefix):]
+                changed = True
+                break
     return s
 
 

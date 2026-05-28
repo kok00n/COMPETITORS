@@ -41,65 +41,121 @@ import pdfplumber
 # Mapowanie znormalizowanego headera (lowercased, whitespace zwiniety, polskie znaki
 # zachowane) -> nasze pole. Headery moga byc wielolinijne ('Nazwa\nsubfunduszu') -
 # clean_cell skleja \n na spacje przed lookupem.
+#
+# Wartosc 'parasol_name_cell' / 'fund_alt_id' / 'report_date_cell' nie mapuje na
+# kolumne w DB - tylko crosscheck/debug.
 HEADER_MAP = {
     # === Pole: fund_id ===
     "identyfikator funduszu": "fund_id",                          # PKO
-    "standardowy identyfikator subfunduszu": "fund_id",           # BNP (zwykle pusty - fallback do subfund_name)
+    "standardowy identyfikator subfunduszu": "fund_id",           # BNP/Erste/Skarbiec (czesto pusty - fallback do subfund_name)
     "standardowy identifikator funduszu": "fund_id",              # PKO alternatywna pisownia
+    "oznaczenie izfia": "fund_id",                                # Allianz (np. PLSFIO00208)
+    "knf_id": "fund_id",                                          # Goldman Sachs
+    "identyfikator krajowy": "fund_id",                           # IPOPEMA/Pocztowy
+    "identyfikator izfia funduszu lub subfunduszu": "fund_id",    # ALIOR/PZU
+    "kod izfia": "fund_id",                                       # VeloBank/NOB
+    "identyfikator funduszu lub subfunduszu": "fund_id",          # Skarbiec
+    "identyfikator subfunduszu": "fund_id",                       # Generali/SGB
     # === Pole: subfund_name ===
-    "nazwa funduszu": "subfund_name",                             # PKO
-    "nazwa subfunduszu": "subfund_name",                          # BNP (tu jest faktyczny fund_id u BNP, np. BNPP_Akcji_Selektywny)
+    "nazwa funduszu": "subfund_name",                             # PKO + Rockbridge (gdy brak 'nazwa subfunduszu' - resolved kontekstowo)
+    "nazwa subfunduszu": "subfund_name",                          # BNP/Allianz/ALIOR/VeloBank/PZU/Skarbiec/Erste
+    "nazwa funduszu / nazwa subfunduszu": "subfund_name",         # Goldman Sachs
+    "nazwa funduszu/subfunduszu": "subfund_name",                 # Allianz alt
+    "nazwa funduszu / subfunduszu": "subfund_name",               # IPOPEMA/Generali
+    # === Pole: parasol_name_cell (debug, nie w DB) ===
+    "pełna nazwa funduszu": "parasol_name_cell",                  # Erste/Skarbiec
+    "nazwa parasola": "parasol_name_cell",                        # Goldman Sachs
     # === Pole: fund_type ===
+    "typ": "fund_type",                                           # Goldman Sachs, IPOPEMA (krotkie)
     "typ funduszu": "fund_type",
     "typ subfunduszu": "fund_type",
-    # === Pole: report_date_cell (cross-check, nie uzywany jako primary) ===
-    "data wyceny": "report_date_cell",
+    # === Pole: fund_alt_id (alternatywny ID na poziomie funduszu, nie w DB osobno) ===
+    "inny identyfikator funduszu": "fund_alt_id",                 # ALIOR/PZU
+    "isin funduszu (id krajowy)": "fund_alt_id",                  # VeloBank
+    "izfdia_i": "fund_alt_id",                                    # Goldman Sachs
+    # === Pole: report_date_cell (debug) ===
+    "data wyceny": "report_date_cell",                            # BNP
+    "data": "report_date_cell",                                   # Rockbridge
     # === Pole: fund_valuation_currency ===
     "waluta wyceny funduszu": "fund_valuation_currency",
     "waluta wyceny aktywów i zobowiązań funduszu": "fund_valuation_currency",
     "waluta wyceny aktywow i zobowiazan funduszu": "fund_valuation_currency",
-    "waluta wyceny": "fund_valuation_currency",                   # short form
+    "waluta wyceny aktywów i zobowiązań subfunduszu": "fund_valuation_currency",  # Generali
+    "waluta wyceny": "fund_valuation_currency",                   # Allianz short
+    "waluta wyceny fund.": "fund_valuation_currency",             # VeloBank short
     # === Pole: issuer_name ===
     "nazwa emitenta": "issuer_name",
+    "emitent": "issuer_name",                                     # Allianz/ALIOR/PZU
+    "nazwa pełna instrumentu": "issuer_name",                     # Goldman Sachs
+    "nazwa instrumentu": "issuer_name",                           # Rockbridge (compound z "nazwa emitenta")
     # === Pole: isin ===
     "identyfikator instrumentu": "isin",                          # PKO
-    "identyfikator instrumentu - kod isin": "isin",               # BNP
+    "identyfikator instrumentu - kod isin": "isin",               # BNP/Erste
+    "identyfikator instrumentu (kod isin)": "isin",               # Skarbiec/Generali
+    "kod isin instrumentu": "isin",                               # Allianz/ALIOR/ESALIENS/PZU
+    "kod isin": "isin",
+    "isin instrumentu": "isin",                                   # VeloBank
+    "isin": "isin",                                               # Goldman Sachs/IPOPEMA short
+    "kod instrumentu": "isin",                                    # Rockbridge
     # === Pole: alt_id ===
     "alternatywny identyfikator": "alt_id",                       # PKO
-    "inny niż kod isin standardowy identyfikator instrumentu": "alt_id",  # BNP
+    "inny niż kod isin standardowy identyfikator instrumentu": "alt_id",  # BNP/Erste/Skarbiec
     "inny niz kod isin standardowy identyfikator instrumentu": "alt_id",
+    "inny standardowy identyfikator instrumentu": "alt_id",       # PZU
+    "inne identyfikatory instrumentu": "alt_id",                  # Allianz
+    "inne id instr.": "alt_id",                                   # VeloBank
+    "dostępny, standardowy identyfikatory instrumentu (inny niż kod isin)": "alt_id",  # Generali
+    "nazwa skrócona instrumentu": "alt_id",                       # Goldman Sachs
     # === Pole: instrument_type ===
     "typ instrumentu": "instrument_type",
+    "kategoria / typ instrumentu": "instrument_type",             # Goldman Sachs
+    "typ\ninstrumentu": "instrument_type",
+    "kategoria": "instrument_type",                               # Rockbridge (jednoslowo) - kontrastowo z 'kategoria instrumentu'
     # === Pole: instrument_category ===
     "kategoria instrumentu": "instrument_category",
+    "klasyfikacja eiopa": "instrument_category",                  # Allianz (Solvency II klasyfikacja)
     # === Pole: issuer_country ===
     "kraj emitenta": "issuer_country",
+    "kod kraju emitenta": "issuer_country",                       # IPOPEMA
     # === Pole: risk_country (rzadkie - tylko PKO) ===
     "kraj ryzyka": "risk_country",
     # === Pole: currency ===
     "waluta instrumentu": "currency",                             # PKO
-    "waluta wykorzystywana do wyceny instrumentu": "currency",    # BNP
+    "waluta wykorzystywana do wyceny instrumentu": "currency",    # BNP/ESALIENS
+    "waluta wyceny instr.": "currency",                           # VeloBank
+    "waluta": "currency",                                         # Rockbridge/Generali (krotkie - wymaga kontekstu)
+    "waalut": "currency",                                         # Goldman Sachs (typo)
     # === Pole: quantity ===
     "ilość instrumentów w portfelu": "quantity",                  # PKO (mnogi)
     "ilość instrumentu w portfelu": "quantity",                   # BNP (pojedynczy)
     "ilosc instrumentow w portfelu": "quantity",
     "ilosc instrumentu w portfelu": "quantity",
+    "ilość instr.": "quantity",                                   # VeloBank
+    "ilość": "quantity",                                          # IPOPEMA/Generali (krotkie)
+    "liczba": "quantity",                                         # Rockbridge
     # === Pole: value_pln ===
     "wartość instrumentu w pln": "value_pln",                     # PKO
-    "wartość instrumentu w walucie wyceny funduszu": "value_pln", # BNP (dla PLN-funduszy = PLN)
+    "wartość instrumentu w walucie wyceny funduszu": "value_pln", # BNP/ESALIENS (dla PLN-fundu = PLN)
     "wartosc instrumentu w pln": "value_pln",
     "wartosc instrumentu w walucie wyceny funduszu": "value_pln",
+    "wartość instrumentu": "value_pln",                           # IPOPEMA
+    "wartość instr.": "value_pln",                                # VeloBank
+    "wartość": "value_pln",                                       # Rockbridge/Generali (krotkie)
     # === Pole: weight_assets_pct ===
-    "udział w wartości aktywów ogółem (%)": "weight_assets_pct",  # PKO (z (%))
+    "udział w wartości aktywów ogółem (%)": "weight_assets_pct",  # PKO
     "udzial w wartosci aktywow ogolem (%)": "weight_assets_pct",
-    "procentowy udział w aktywach ogółem": "weight_assets_pct",   # BNP (bez (%))
+    "procentowy udział w aktywach ogółem": "weight_assets_pct",   # BNP
     "procentowy udzial w aktywach ogolem": "weight_assets_pct",
-    # === Pole: weight_nav_pct (tylko PKO ma osobno, BNP nie ma) ===
+    "procentowy": "weight_assets_pct",                            # Generali (krotki nieintuicyjny)
+    "udział": "weight_assets_pct",                                # Rockbridge (krotki)
+    "udział w portfelu [%]": "weight_nav_pct",                    # IPOPEMA (faktycznie NAV-based)
+    # === Pole: weight_nav_pct (tylko PKO ma osobno, reszta uzywa fallback z weight_assets_pct) ===
     "udział w nav (%)": "weight_nav_pct",
     "udzial w nav (%)": "weight_nav_pct",
     # === Pole: info ===
     "informacje uzupełniające": "info",
     "informacje uzupelniajace": "info",
+    "instrument bazowy": "info",                                  # Rockbridge
 }
 
 # Wartosci traktowane jako pusta komorka (-> None)
@@ -139,9 +195,33 @@ HEADER_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
-# Heurystyka wykrycia wiersza naglowkowego: zawiera 'Nazwa emitenta' albo
-# 'Identyfikator instrumentu' (te wystepuja w obu stylach PKO i BNP).
-HEADER_DETECTION_TOKENS = ("nazwa emitenta", "identyfikator instrumentu", "nazwa subfunduszu")
+# Heurystyka wykrycia wiersza naglowkowego: zawiera ktorys z tych tokenow.
+# Pokrywa PKO, BNP, Allianz, Goldman Sachs, IPOPEMA, ESALIENS, ALIOR, VeloBank,
+# PZU, Skarbiec, Generali, Rockbridge layouts.
+HEADER_DETECTION_TOKENS = (
+    "nazwa emitenta",
+    "identyfikator instrumentu",
+    "nazwa subfunduszu",
+    "nazwa funduszu / nazwa subfunduszu",
+    "nazwa funduszu / subfunduszu",
+    "nazwa funduszu/subfunduszu",
+    "emitent",
+    "kod isin",
+    "isin instrumentu",
+    "knf_id",
+    "kod izfia",
+    "oznaczenie izfia",
+    "identyfikator subfunduszu",
+    "identyfikator funduszu lub subfunduszu",
+    "identyfikator izfia",
+    "nazwa instrumentu",     # Rockbridge
+    "kod instrumentu",        # Rockbridge
+)
+
+# Minimum N zmapowanych pol w header_index zeby uznac wykryty header za prawdziwy.
+# Jesli mniej, prawdopodobnie to junk row (np. Skarbiec sklejony header w cell[0]) -
+# fallback to PKO/SKARBIEC fixed headers.
+MIN_HEADER_INDEX_FIELDS = 5
 
 # Fallback header dla PKO-style PDFow gdzie naglowek NIE jest w extract_tables()
 # (pdfplumber zwraca tylko wiersze danych, header jest jako float text na page 1).
@@ -164,6 +244,29 @@ PKO_FIXED_HEADER_18 = [
     "Wartość instrumentu w PLN",
     "Udział w wartości aktywów ogółem (%)",
     "Udział w NAV (%)",
+    "Informacje uzupełniające",
+]
+
+# Fallback header dla Skarbiec/PZU/ALIOR-style PDFow (17 kolumn).
+# Header w extract_text() jako float, w tabelach jest pierwszy wiersz z junk text
+# rozdzielonym przez \n (multi-line cell). Drugi wiersz to juz dane.
+SKARBIEC_FIXED_HEADER_17 = [
+    "Identyfikator funduszu lub subfunduszu",
+    "Pełna nazwa funduszu",
+    "Nazwa subfunduszu",
+    "Typ funduszu",
+    "Standardowy identyfikator subfunduszu",
+    "Waluta wyceny aktywów i zobowiązań funduszu",
+    "Nazwa emitenta",
+    "Identyfikator instrumentu (kod ISIN)",
+    "Inny niż kod ISIN standardowy identyfikator instrumentu",
+    "Typ instrumentu",
+    "Kategoria instrumentu",
+    "Kraj emitenta",
+    "Waluta wykorzystywana do wyceny instrumentu",
+    "Ilość instrumentu w portfelu",
+    "Wartość instrumentu w walucie wyceny funduszu",
+    "Procentowy udział w Aktywach ogółem",
     "Informacje uzupełniające",
 ]
 
@@ -231,23 +334,43 @@ def parse_pdf(source: bytes | str | Path) -> ParsedPDF:
             if header_row:
                 break
 
-        # Fallback dla PKO: brak header w tabelach (pdfplumber traktuje kazdy wiersz
-        # jako osobna tabele 1-wierszowa). Jesli wiekszosc wierszy ma 18 komorek,
-        # uzywamy PKO_FIXED_HEADER_18 jako defaultowy header.
-        if not header_row:
-            cells_18_count = sum(
-                1 for tbl in all_tables for row in tbl
-                if row and len(row) == 18
-            )
-            if cells_18_count > 0 and cells_18_count / max(result.raw_rows_count, 1) > 0.9:
-                header_row = PKO_FIXED_HEADER_18
+        # Sprawdz czy detected header daje sensowny header_index. Jesli nie (junk row,
+        # cell[0] sklejony z calym tekstem) - odrzuc i sprobuj fallback.
+        def _try_header(row):
+            cleaned = [_clean_cell(c) for c in row]
+            idx = _build_header_index(cleaned)
+            return cleaned, idx
 
+        cleaned_header: list[str] = []
+        header_index: dict[str, int] = {}
+        if header_row:
+            cleaned_header, header_index = _try_header(header_row)
+            if len(header_index) < MIN_HEADER_INDEX_FIELDS:
+                # Header zbyt biedny - reject, sprobujemy fallback
+                header_row = None
+                cleaned_header = []
+                header_index = {}
+
+        # Fallback dla PDFow gdzie naglowek NIE jest w extract_tables() albo header_row
+        # byl junk (PKO, Skarbiec): wykrywamy po dominujacej liczbie kolumn:
+        #   - 18 col → PKO_FIXED_HEADER_18
+        #   - 17 col → SKARBIEC_FIXED_HEADER_17
         if not header_row:
+            cells_18 = sum(1 for tbl in all_tables for row in tbl if row and len(row) == 18)
+            cells_17 = sum(1 for tbl in all_tables for row in tbl if row and len(row) == 17)
+            total = max(result.raw_rows_count, 1)
+            if cells_18 / total > 0.5:
+                header_row = PKO_FIXED_HEADER_18
+            elif cells_17 / total > 0.5:
+                header_row = SKARBIEC_FIXED_HEADER_17
+            if header_row:
+                cleaned_header, header_index = _try_header(header_row)
+
+        if not header_row or not header_index:
             return result
 
-        cleaned_header = [_clean_cell(c) for c in header_row]
         result.header_columns = cleaned_header
-        result.header_index = _build_header_index(cleaned_header)
+        result.header_index = header_index
 
         # 4. Wykryj layout style (do debugowania)
         if len(cleaned_header) == 18 and "fund_id" in result.header_index:
@@ -298,13 +421,44 @@ def _clean_cell(c) -> str:
 
 
 def _build_header_index(cleaned_header: list[str]) -> dict[str, int]:
-    """Mapuj field_name -> column index na podstawie naglowkow w PDFie."""
+    """Mapuj field_name -> column index na podstawie naglowkow w PDFie.
+
+    Kontekst-aware: rozwiazuje konflikt 'Nazwa funduszu' = parasol vs subfundusz.
+    Jesli w PDFie istnieje kolumna 'Nazwa subfunduszu' lub 'Nazwa funduszu/subfunduszu'
+    (ALIOR/PZU/VeloBank/Skarbiec), to 'Nazwa funduszu' oznacza nazwe parasola, nie
+    subfunduszu. Inaczej (Rockbridge) 'Nazwa funduszu' = subfund_name (compound
+    parasol+subfund w jednym polu).
+    """
+    normalized = [c.lower().strip() for c in cleaned_header]
+    norm_set = set(normalized)
+
+    # Czy istnieje wyraznie nazwa subfunduszu w innej kolumnie?
+    has_explicit_subfund = any(h in norm_set for h in (
+        "nazwa subfunduszu",
+        "nazwa funduszu / nazwa subfunduszu",
+        "nazwa funduszu/subfunduszu",
+        "nazwa funduszu / subfunduszu",
+    ))
+
     out: dict[str, int] = {}
     for idx, cell in enumerate(cleaned_header):
         norm = cell.lower().strip()
+        if not norm:
+            continue
+
+        # Special case: 'nazwa funduszu' (sole) - context-dependent
+        if norm == "nazwa funduszu":
+            if has_explicit_subfund:
+                # ALIOR/PZU/VeloBank: 'Nazwa funduszu' = parasol
+                out.setdefault("parasol_name_cell", idx)
+            else:
+                # Rockbridge: jedyna kolumna z nazwa - traktujemy jako subfund_name
+                out.setdefault("subfund_name", idx)
+            continue
+
         field_name = HEADER_MAP.get(norm)
-        if field_name and field_name not in out:
-            out[field_name] = idx
+        if field_name:
+            out.setdefault(field_name, idx)
     return out
 
 
