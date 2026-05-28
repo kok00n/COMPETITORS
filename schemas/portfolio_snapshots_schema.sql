@@ -37,9 +37,9 @@ CREATE TABLE IF NOT EXISTS portfolio_snapshots (
     inserted_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (parasol_code) REFERENCES funds(parasol_code) ON DELETE CASCADE,
-    -- Jeden snapshot per (parasol_code, fund_id, report_date). fund_id moze byc NULL
-    -- przy pendingu/error, wiec COALESCE w UNIQUE.
-    UNIQUE (parasol_code, fund_id, report_date)
+    -- Jeden snapshot per (parasol_code, report_date). fund_id jest NULL przy scrape
+    -- (przed parsowaniem) - uzupelnia go parser. Klucz stabilny dla UPSERT-a.
+    UNIQUE (parasol_code, report_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_snapshots_fund_date

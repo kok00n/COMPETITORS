@@ -96,8 +96,47 @@ CREATE TABLE IF NOT EXISTS portfolio_snapshots (
     inserted_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (parasol_code) REFERENCES funds(parasol_code) ON DELETE CASCADE,
-    UNIQUE (parasol_code, fund_id, report_date)
+    UNIQUE (parasol_code, report_date)
 );
+
+-- Migration: poprzednie wersje schemy mialy UNIQUE (parasol_code, fund_id, report_date).
+-- Zmieniamy na (parasol_code, report_date) bo scrape tworzy snapshot z fund_id=NULL
+-- przed parsowaniem - potrzebny stabilny klucz upsert.
+DO $migr$
+DECLARE
+    old_constraint_name TEXT;
+BEGIN
+    -- Znajdz stary constraint (po liscie kolumn 3-element-ami)
+    SELECT c.conname INTO old_constraint_name
+    FROM pg_constraint c
+    JOIN pg_class t ON c.conrelid = t.oid
+    WHERE t.relname = 'portfolio_snapshots'
+      AND c.contype = 'u'
+      AND ARRAY['parasol_code','fund_id','report_date']::TEXT[] <@ (
+          SELECT ARRAY_AGG(attname) FROM pg_attribute
+          WHERE attrelid = c.conrelid AND attnum = ANY(c.conkey)
+      );
+    IF old_constraint_name IS NOT NULL THEN
+        EXECUTE FORMAT('ALTER TABLE portfolio_snapshots DROP CONSTRAINT %I', old_constraint_name);
+        RAISE NOTICE 'Dropped old constraint: %', old_constraint_name;
+        -- ADD nowy (jesli juz nie ma)
+        IF NOT EXISTS (
+            SELECT 1 FROM pg_constraint c2
+            JOIN pg_class t2 ON c2.conrelid = t2.oid
+            WHERE t2.relname = 'portfolio_snapshots' AND c2.contype = 'u'
+              AND ARRAY['parasol_code','report_date']::TEXT[] = (
+                  SELECT ARRAY_AGG(attname ORDER BY attname) FROM pg_attribute
+                  WHERE attrelid = c2.conrelid AND attnum = ANY(c2.conkey)
+              )
+        ) THEN
+            ALTER TABLE portfolio_snapshots
+                ADD CONSTRAINT portfolio_snapshots_parasol_code_report_date_key
+                UNIQUE (parasol_code, report_date);
+            RAISE NOTICE 'Added new constraint (parasol_code, report_date)';
+        END IF;
+    END IF;
+END
+$migr$;
 
 CREATE INDEX IF NOT EXISTS idx_snapshots_fund_date ON portfolio_snapshots (fund_id, report_date DESC);
 CREATE INDEX IF NOT EXISTS idx_snapshots_parasol_date ON portfolio_snapshots (parasol_code, report_date DESC);
@@ -436,6 +475,38 @@ LANGUAGE sql STABLE AS $$
       ))
       AND h.w_avg_yield IS NOT NULL AND h.w_avg_mod_duration IS NOT NULL;
 $$;
+
+-- =====================================================================
+-- 11. STORAGE BUCKET (raw-pdfs)
+-- =====================================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('raw-pdfs', 'raw-pdfs', FALSE, 52428800, ARRAY['application/pdf'])
+ON CONFLICT (id) DO UPDATE
+SET file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'raw_pdfs_read_authenticated') THEN
+        DROP POLICY raw_pdfs_read_authenticated ON storage.objects;
+    END IF;
+    EXECUTE $POL$
+        CREATE POLICY raw_pdfs_read_authenticated
+        ON storage.objects FOR SELECT
+        TO authenticated, service_role
+        USING (bucket_id = 'raw-pdfs')
+    $POL$;
+    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'raw_pdfs_write_service_role') THEN
+        DROP POLICY raw_pdfs_write_service_role ON storage.objects;
+    END IF;
+    EXECUTE $POL$
+        CREATE POLICY raw_pdfs_write_service_role
+        ON storage.objects FOR INSERT
+        TO service_role
+        WITH CHECK (bucket_id = 'raw-pdfs')
+    $POL$;
+END $$;
 
 -- =========================================================================
 -- KONIEC SETUPU. Po wykonaniu uruchom 'python scripts/seed_funds.py' lokalnie
