@@ -1,0 +1,27 @@
+# Cloud-side dependencies (GitHub Actions: scraper + parser + analytics + LLM).
+# Bloomberg pipeline ma osobny plik requirements-local.txt, dashboard ma requirements-notebook.txt.
+
+# HTTP + Supabase REST
+requests==2.32.3
+
+# YAML config (lista funduszy w config/funds.yaml)
+PyYAML==6.0.2
+
+# JS-rendered scraping (analizy.pl #competition tab nie ma listy w statycznym HTML)
+playwright==1.49.1
+
+# PDF parsing - skladu portfela z dokumenty.analizy.pl
+pdfplumber==0.11.4
+
+# Analityka portfela (weighted yield/duration/CS01, exposures)
+pandas==2.2.3
+numpy==2.1.3
+
+# LLM commentary - Claude Opus 4.7 z prompt caching
+anthropic==0.40.0
+
+# Excel export (rekomendacje ISIN)
+openpyxl==3.1.5
+
+# Daty (do iteracji month-end przy backfillu 4 lata wstecz)
+python-dateutil==2.9.0

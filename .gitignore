@@ -1,0 +1,62 @@
+# --- Sekrety i konfiguracja srodowiskowa ---
+.env
+.env.*
+*.env
+secrets/
+credentials.json
+*.key
+*.pem
+*service_role*
+*.local.json
+settings.local.json
+
+# --- Tymczasowe pliki / sample uzywane do iteracji parsera ---
+_sample_*.pdf
+_sample_*.json
+_sample_*.html
+_test_*.py
+_test_*.js
+
+# --- Pobierane PDFy (zrodlo: dokumenty.analizy.pl) ---
+# Trzymamy je w Supabase Storage, lokalnie tylko jako cache do debugowania.
+raw_pdfs/
+
+# --- Pliki Bloomberg queue (wymiana lokalna <-> Supabase) ---
+bbg_queue_*.xlsx
+bbg_queue_*.csv
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# --- Playwright cache ---
+playwright-report/
+test-results/
+.playwright/
+
+# --- IDE / edytory ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- OS junk ---
+Thumbs.db
+desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# --- Claude Code ---
+.claude/
+
+# --- OneDrive metadata ---
+.tmp.drivedownload/
+
+# --- Jupyter checkpoints ---
+.ipynb_checkpoints/
+
+# --- Dashboard output (publikowany przez GH Pages, nie commitujemy) ---
+public/

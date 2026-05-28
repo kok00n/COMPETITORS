@@ -1,0 +1,11 @@
+# Local + GH Actions dependencies dla peers_dashboard.ipynb -> public/index.html.
+# Install: pip install -r requirements-notebook.txt
+
+jupyterlab>=4.0
+pandas>=2.2
+plotly>=5.20
+python-dotenv>=1.0
+requests>=2.32
+nbconvert>=7.0
+anthropic>=0.40
+openpyxl>=3.1

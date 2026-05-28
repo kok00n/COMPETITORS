@@ -1,0 +1,13 @@
+# Local-only dependencies dla bbg_fill.py - dziala na stacji z Bloombergiem
+# (BLPAPI nie zadziala w GH Actions, licencja BBG jest per-maszyna).
+# Install: pip install -r requirements-local.txt
+
+# Bloomberg API - wymaga zainstalowanego terminala BBG + bbcomm agent
+# UWAGA: blpapi nie ma na PyPI w standardowy sposob, instalujemy z BBG repo:
+#   pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi
+blpapi>=3.20.0
+
+# Wspólne z cloud (zeby skrypt mogl pisac do Supabase)
+requests>=2.32
+PyYAML>=6.0
+python-dateutil>=2.9

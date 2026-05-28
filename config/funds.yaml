@@ -1,0 +1,391 @@
+funds:
+- parasol_code: AIG02
+  fund_id: null
+  parasol_name: null
+  subfund_name: Rockbridge Neo Obligacji Skarbowych
+  tfi_name: Rockbridge TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: rockbridge-neo-obligacji-skarbowych
+  notes: null
+- parasol_code: ALL100
+  fund_id: null
+  parasol_name: null
+  subfund_name: Allianz Obligacji Dynamiczny
+  tfi_name: Allianz Polska TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: allianz-obligacji-dynamiczny
+  notes: null
+- parasol_code: ALL26
+  fund_id: null
+  parasol_name: null
+  subfund_name: Allianz Polskich Obligacji Skarbowych
+  tfi_name: Allianz Polska TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: allianz-polskich-obligacji-skarbowych
+  notes: null
+- parasol_code: ALL81
+  fund_id: null
+  parasol_name: null
+  subfund_name: Allianz Trezor
+  tfi_name: Allianz Polska TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: allianz-trezor
+  notes: null
+- parasol_code: ARK23
+  fund_id: null
+  parasol_name: null
+  subfund_name: Erste Prestiż Obligacji Skarbowych
+  tfi_name: Erste TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: erste-prestiz-obligacji-skarbowych
+  notes: null
+- parasol_code: ARK65
+  fund_id: null
+  parasol_name: null
+  subfund_name: Erste Prestiż Spokojna Inwestycja
+  tfi_name: Erste TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: erste-prestiz-spokojna-inwestycja
+  notes: null
+- parasol_code: ARK66
+  fund_id: null
+  parasol_name: null
+  subfund_name: Erste Dłużny Krótkoterminowy
+  tfi_name: Erste TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: erste-dluzny-krotkoterminowy
+  notes: null
+- parasol_code: AXA05
+  fund_id: null
+  parasol_name: null
+  subfund_name: UNIQA Obligacji Uniwersalny
+  tfi_name: UNIQA TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: uniqa-obligacji-uniwersalny
+  notes: null
+- parasol_code: CAB03
+  fund_id: null
+  parasol_name: null
+  subfund_name: Rockbridge Obligacji
+  tfi_name: Rockbridge TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: rockbridge-obligacji
+  notes: null
+- parasol_code: CAB18
+  fund_id: null
+  parasol_name: null
+  subfund_name: Rockbridge Obligacji Aktywny 2
+  tfi_name: Rockbridge TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: rockbridge-obligacji-aktywny-2
+  notes: null
+- parasol_code: CAB44
+  fund_id: null
+  parasol_name: null
+  subfund_name: Rockbridge Obligacji Aktywny 1
+  tfi_name: Rockbridge TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: rockbridge-obligacji-aktywny-1
+  notes: null
+- parasol_code: CAS19
+  fund_id: null
+  parasol_name: null
+  subfund_name: Caspar Obligacji Skarbowy
+  tfi_name: Caspar TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: caspar-obligacji-skarbowy
+  notes: null
+- parasol_code: DWS02
+  fund_id: null
+  parasol_name: null
+  subfund_name: Investor Obligacji Uniwersalny
+  tfi_name: Investors TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: investor-obligacji-uniwersalny
+  notes: null
+- parasol_code: DWS26
+  fund_id: null
+  parasol_name: null
+  subfund_name: Investor Obligacji Skarbowych Krótkoterminowy
+  tfi_name: Investors TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: investor-obligacji-skarbowych-krotkoterminowy
+  notes: null
+- parasol_code: FOR39
+  fund_id: null
+  parasol_name: null
+  subfund_name: BNP Paribas Obligacji Skarbowych
+  tfi_name: BNP Paribas TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: bnp-paribas-obligacji-skarbowych
+  notes: null
+- parasol_code: ING03
+  fund_id: null
+  parasol_name: null
+  subfund_name: Goldman Sachs Konserwatywny
+  tfi_name: Goldman Sachs TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: goldman-sachs-konserwatywny
+  notes: null
+- parasol_code: ING04
+  fund_id: null
+  parasol_name: null
+  subfund_name: Goldman Sachs Obligacji
+  tfi_name: Goldman Sachs TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: goldman-sachs-obligacji
+  notes: null
+- parasol_code: ING54
+  fund_id: null
+  parasol_name: null
+  subfund_name: Goldman Sachs Konserwatywny Plus
+  tfi_name: Goldman Sachs TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: goldman-sachs-konserwatywny-plus
+  notes: null
+- parasol_code: ING90
+  fund_id: null
+  parasol_name: null
+  subfund_name: Goldman Sachs Indeks Obligacji
+  tfi_name: Goldman Sachs TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: goldman-sachs-indeks-obligacji
+  notes: null
+- parasol_code: IPO166
+  fund_id: null
+  parasol_name: null
+  subfund_name: Pocztowy Obligacji Uniwersalny
+  tfi_name: Pocztowy TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: pocztowy-obligacji-uniwersalny
+  notes: null
+- parasol_code: KAH03
+  fund_id: null
+  parasol_name: null
+  subfund_name: Esaliens Obligacji Uniwersalny
+  tfi_name: Esaliens TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: esaliens-obligacji-uniwersalny
+  notes: null
+- parasol_code: LUK03
+  fund_id: null
+  parasol_name: null
+  subfund_name: Credit Agricole Dłużny Krótkoterminowy
+  tfi_name: Credit Agricole TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: credit-agricole-dluzny-krotkoterminowy
+  notes: null
+- parasol_code: MBK03
+  fund_id: null
+  parasol_name: null
+  subfund_name: mFundusz Konserwatywny SFIO
+  tfi_name: Goldman Sachs TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: mfundusz-konserwatywny-sfio
+  notes: null
+- parasol_code: MON17
+  fund_id: null
+  parasol_name: null
+  subfund_name: ALIOR Obligacji Uniwersalny
+  tfi_name: Alior TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: alior-obligacji-uniwersalny
+  notes: null
+- parasol_code: NOB20
+  fund_id: null
+  parasol_name: null
+  subfund_name: VeloFund Obligacji
+  tfi_name: VeloBank TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: velofund-obligacji
+  notes: null
+- parasol_code: PIO82
+  fund_id: null
+  parasol_name: null
+  subfund_name: Pekao Dłużny Aktywny
+  tfi_name: Pekao TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: pekao-dluzny-aktywny
+  notes: null
+- parasol_code: PIO89
+  fund_id: null
+  parasol_name: null
+  subfund_name: Pekao Spokojna Inwestycja
+  tfi_name: Pekao TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: pekao-spokojna-inwestycja
+  notes: null
+- parasol_code: PZU03
+  fund_id: null
+  parasol_name: null
+  subfund_name: PZU Papierów Dłużnych POLONEZ
+  tfi_name: PZU TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: pzu-papierow-dluznych-polonez
+  notes: null
+- parasol_code: PZU45
+  fund_id: null
+  parasol_name: null
+  subfund_name: PZU Sejf+
+  tfi_name: PZU TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: pzu-sejf
+  notes: null
+- parasol_code: PZU46
+  fund_id: null
+  parasol_name: null
+  subfund_name: inPZU Inwestycji Ostrożnych Obligacje Krótkoterminowe O
+  tfi_name: PZU TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: inpzu-inwestycji-ostroznych-obligacje-krotkoterminowe-o
+  notes: null
+- parasol_code: PZU47
+  fund_id: null
+  parasol_name: null
+  subfund_name: inPZU Polskie Obligacje Skarbowe O
+  tfi_name: PZU TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: inpzu-polskie-obligacje-skarbowe-o
+  notes: null
+- parasol_code: QRS27
+  fund_id: null
+  parasol_name: null
+  subfund_name: QUERCUS Obligacji Skarbowych
+  tfi_name: QUERCUS TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: quercus-obligacji-skarbowych
+  notes: null
+- parasol_code: QRS33
+  fund_id: null
+  parasol_name: null
+  subfund_name: QUERCUS Dłużny 1
+  tfi_name: QUERCUS TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: quercus-dluzny-1
+  notes: null
+- parasol_code: SKR05
+  fund_id: null
+  parasol_name: null
+  subfund_name: Skarbiec Obligacji
+  tfi_name: Skarbiec TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: skarbiec-obligacji
+  notes: null
+- parasol_code: SKR113
+  fund_id: null
+  parasol_name: null
+  subfund_name: Skarbiec Krótkoterminowy Skarbowy
+  tfi_name: Skarbiec TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: skarbiec-krotkoterminowy-skarbowy
+  notes: null
+- parasol_code: UNI07
+  fund_id: null
+  parasol_name: null
+  subfund_name: Generali Korona Obligacje
+  tfi_name: Generali Investments TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: generali-korona-obligacje
+  notes: null
+- parasol_code: UNI28
+  fund_id: null
+  parasol_name: null
+  subfund_name: Generali Obligacje Aktywny
+  tfi_name: Generali Investments TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: generali-obligacje-aktywny
+  notes: null
+- parasol_code: UNI72
+  fund_id: null
+  parasol_name: null
+  subfund_name: SGB Dłużny
+  tfi_name: SGB TFI
+  peer_groups:
+  - fod
+  refresh_freq: monthly
+  analizy_slug: sgb-dluzny
+  notes: null
+- parasol_code: UNI73
+  fund_id: null
+  parasol_name: null
+  subfund_name: Generali Konserwatywny
+  tfi_name: Generali Investments TFI
+  peer_groups:
+  - fsk
+  refresh_freq: monthly
+  analizy_slug: generali-konserwatywny
+  notes: null
