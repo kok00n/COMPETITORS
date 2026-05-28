@@ -42,10 +42,14 @@ NAME_PREFIXES_TO_STRIP = [
 
 
 def _normalize_name(s: str) -> str:
-    """Lowercased, usuniete biale znaki + popularne prefiksy."""
+    """Lowercased, usuniete biale znaki + underscores + popularne prefiksy.
+
+    Underscores wystepuja w BNP layout (fund_id = 'BNP_Paribas_Obligacji_Skarbowych').
+    Whitespace usuwamy bo pdfplumber czasem rozdziela slowa spacjami losowo.
+    """
     if not s:
         return ""
-    s = re.sub(r"\s+", "", s).lower()
+    s = re.sub(r"[\s_]+", "", s).lower()
     for prefix in NAME_PREFIXES_TO_STRIP:
         if s.startswith(prefix):
             s = s[len(prefix):]
@@ -146,9 +150,14 @@ def main() -> None:
         unique_fund_ids,
     )
 
-    # SELECT pending snapshots
-    filters = ["scrape_status=eq.ok"]
-    if not args.force:
+    # SELECT pending snapshots.
+    # --force: bierze wszystko (rowniez 'partial' z poprzednich failed parsowan)
+    # bez --force: tylko scrape_status='ok' AND holdings_count IS NULL
+    filters = []
+    if args.force:
+        filters.append("scrape_status=in.(ok,partial)")
+    else:
+        filters.append("scrape_status=eq.ok")
         filters.append("holdings_count=is.null")
     if args.parasol:
         filters.append(f"parasol_code=eq.{args.parasol}")
