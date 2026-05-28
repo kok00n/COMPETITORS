@@ -102,38 +102,51 @@ CREATE TABLE IF NOT EXISTS portfolio_snapshots (
 -- Migration: poprzednie wersje schemy mialy UNIQUE (parasol_code, fund_id, report_date).
 -- Zmieniamy na (parasol_code, report_date) bo scrape tworzy snapshot z fund_id=NULL
 -- przed parsowaniem - potrzebny stabilny klucz upsert.
+--
+-- pg_attribute.attname to type `name`, nie text - cast attname::TEXT przed
+-- porownaniem z ARRAY['...']::TEXT[].
 DO $migr$
 DECLARE
     old_constraint_name TEXT;
+    new_constraint_exists BOOLEAN;
 BEGIN
-    -- Znajdz stary constraint (po liscie kolumn 3-element-ami)
+    -- Znajdz stary constraint (po liscie kolumn 3-element-ami: parasol_code+fund_id+report_date)
     SELECT c.conname INTO old_constraint_name
     FROM pg_constraint c
     JOIN pg_class t ON c.conrelid = t.oid
     WHERE t.relname = 'portfolio_snapshots'
       AND c.contype = 'u'
+      AND (
+          SELECT COUNT(*) FROM unnest(c.conkey) AS k
+      ) = 3
       AND ARRAY['parasol_code','fund_id','report_date']::TEXT[] <@ (
-          SELECT ARRAY_AGG(attname) FROM pg_attribute
+          SELECT ARRAY_AGG(attname::TEXT) FROM pg_attribute
           WHERE attrelid = c.conrelid AND attnum = ANY(c.conkey)
       );
+
     IF old_constraint_name IS NOT NULL THEN
         EXECUTE FORMAT('ALTER TABLE portfolio_snapshots DROP CONSTRAINT %I', old_constraint_name);
-        RAISE NOTICE 'Dropped old constraint: %', old_constraint_name;
-        -- ADD nowy (jesli juz nie ma)
-        IF NOT EXISTS (
-            SELECT 1 FROM pg_constraint c2
-            JOIN pg_class t2 ON c2.conrelid = t2.oid
-            WHERE t2.relname = 'portfolio_snapshots' AND c2.contype = 'u'
-              AND ARRAY['parasol_code','report_date']::TEXT[] = (
-                  SELECT ARRAY_AGG(attname ORDER BY attname) FROM pg_attribute
-                  WHERE attrelid = c2.conrelid AND attnum = ANY(c2.conkey)
-              )
-        ) THEN
-            ALTER TABLE portfolio_snapshots
-                ADD CONSTRAINT portfolio_snapshots_parasol_code_report_date_key
-                UNIQUE (parasol_code, report_date);
-            RAISE NOTICE 'Added new constraint (parasol_code, report_date)';
-        END IF;
+        RAISE NOTICE 'Migration: dropped old constraint %', old_constraint_name;
+    END IF;
+
+    -- Czy nowy constraint juz istnieje? (lista kolumn = exactly [parasol_code, report_date])
+    SELECT EXISTS (
+        SELECT 1 FROM pg_constraint c2
+        JOIN pg_class t2 ON c2.conrelid = t2.oid
+        WHERE t2.relname = 'portfolio_snapshots'
+          AND c2.contype = 'u'
+          AND (SELECT COUNT(*) FROM unnest(c2.conkey) AS k) = 2
+          AND ARRAY['parasol_code','report_date']::TEXT[] <@ (
+              SELECT ARRAY_AGG(attname::TEXT) FROM pg_attribute
+              WHERE attrelid = c2.conrelid AND attnum = ANY(c2.conkey)
+          )
+    ) INTO new_constraint_exists;
+
+    IF NOT new_constraint_exists THEN
+        ALTER TABLE portfolio_snapshots
+            ADD CONSTRAINT portfolio_snapshots_parasol_code_report_date_key
+            UNIQUE (parasol_code, report_date);
+        RAISE NOTICE 'Migration: added new constraint (parasol_code, report_date)';
     END IF;
 END
 $migr$;
