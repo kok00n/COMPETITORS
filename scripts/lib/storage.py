@@ -33,22 +33,22 @@ def _headers(content_type: str | None = None, upsert: bool = False) -> dict:
     return h
 
 
-def upload_pdf(path: str, data: bytes, *, upsert: bool = True) -> str:
+def upload_pdf(path: str, data: bytes, *, upsert: bool = True,
+               content_type: str = "application/pdf") -> str:
     """Upload bytes do bucketu raw-pdfs pod sciezka `path`.
 
     Args:
         path: sciezka w bucketcie, np. 'PCS05/2026-04-30.pdf'
-        data: bytes pliku PDF
-        upsert: True = overwrite jesli juz istnieje. Default True bo PDF z analizy.pl
-            jest deterministyczny dla (parasol_code, date) - ponowny upload tego samego
-            pliku nie powinien dodawac wersji.
+        data: bytes pliku (PDF default; tez JSON dla LLM cache)
+        upsert: True = overwrite jesli juz istnieje
+        content_type: 'application/pdf' (default) lub 'application/json' (dla cache_llm/)
 
     Returns:
         full path w buckecie (do zapisu w portfolio_snapshots.pdf_path)
     """
     url = _storage_url(path)
     r = _retry(
-        lambda: requests.post(url, headers=_headers("application/pdf", upsert=upsert), data=data, timeout=60),
+        lambda: requests.post(url, headers=_headers(content_type, upsert=upsert), data=data, timeout=60),
         op="upload",
         path=path,
     )

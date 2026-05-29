@@ -12,13 +12,20 @@ playwright==1.49.1
 
 # PDF parsing - skladu portfela z dokumenty.analizy.pl
 pdfplumber==0.11.4
+pypdf>=6.0  # split PDF na strony dla LLM chunked
+
+# OCR dla PDF gdzie pdfplumber nie radzi sobie (Goldman/Pekao bitmap mask).
+# Wymaga zewn. binaries: Tesseract + poppler (Windows: install installers).
+pdf2image>=1.17
+pytesseract>=0.3.10
+Pillow>=10.0
 
 # Analityka portfela (weighted yield/duration/CS01, exposures)
 pandas==2.2.3
 numpy==2.1.3
 
-# LLM commentary - Claude Opus 4.7 z prompt caching
-anthropic==0.40.0
+# LLM - Claude PDF parser fallback (lib/llm_pdf_parser.py) + commentary
+anthropic>=0.105.0
 
 # Excel export (rekomendacje ISIN)
 openpyxl==3.1.5

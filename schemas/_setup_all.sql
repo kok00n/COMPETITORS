@@ -494,7 +494,8 @@ $$;
 -- =====================================================================
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES ('raw-pdfs', 'raw-pdfs', FALSE, 52428800, ARRAY['application/pdf'])
+VALUES ('raw-pdfs', 'raw-pdfs', FALSE, 52428800,
+        ARRAY['application/pdf', 'application/json'])  -- JSON dla cache_llm/
 ON CONFLICT (id) DO UPDATE
 SET file_size_limit = EXCLUDED.file_size_limit,
     allowed_mime_types = EXCLUDED.allowed_mime_types;
